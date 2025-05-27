@@ -7,18 +7,18 @@ Proyek ini bertujuan untuk membangun sistem rekomendasi film menggunakan pendeka
 
 ---
 ## Business Understanding
-**Problem Statements**
+### Problem Statements**
 
  1. Bagaimana cara memberikan rekomendasi film yang relevan kepada pengguna berdasarkan atribut intrinsik (konten) dari film tersebut?
  2. Bagaimana memanfaatkan fitur-fitur film seperti `overview`, `genres`, `keywords`, `cast`, dan `crew` untuk mengukur kesamaan antar film dan menghasilkan daftar rekomendasi yang dipersonalisasi?
  3. Bagaimana menangani variasi dalam input pengguna, seperti judul film yang mungkin tidak diketik dengan ejaan yang sempurna atau lengkap, agar tetap dapat memberikan rekomendasi yang berguna?
 
-**Goals**
+### Goals
  1. Mengembangkan sebuah sistem rekomendasi film yang mampu menyarankan film-film berdasarkan kemiripan konten dengan film yang diberikan sebagai input.
  2. Mengekstraksi dan memproses fitur-fitur tekstual dan kategorikal dari dataset film (overview, genre, kata kunci, pemeran utama, dan sutradara) untuk membuat representasi konten yang komprehensif untuk setiap film.
  3. Mengimplementasikan mekanisme pencarian judul film yang fleksibel untuk mengakomodasi input pengguna yang tidak persis sama dengan judul di database dan tetap memberikan rekomendasi yang relevan.
 
-**Solution Approach**
+### Solution Approach
  - **Solution Statement:** Mengimplementasikan sistem rekomendasi berbasis konten (content-based filtering) dengan langkah-langkah sebagai berikut:
     1. Penggabungan data film dan data kredit (pemeran dan kru).
     2. Pra-pemrosesan data untuk membersihkan dan mengubah fitur-fitur relevan (overview, genres, keywords, cast, crew) menjadi format yang seragam dan dapat diolah. Ini termasuk parsing data JSON, ekstraksi nama aktor dan sutradara, serta normalisasi teks (menghilangkan spasi dan mengubah ke huruf kecil).
