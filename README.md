@@ -7,7 +7,7 @@ Proyek ini bertujuan untuk membangun sistem rekomendasi film menggunakan pendeka
 
 ---
 ## Business Understanding
-### Problem Statements**
+### Problem Statements
 
  1. Bagaimana cara memberikan rekomendasi film yang relevan kepada pengguna berdasarkan atribut intrinsik (konten) dari film tersebut?
  2. Bagaimana memanfaatkan fitur-fitur film seperti `overview`, `genres`, `keywords`, `cast`, dan `crew` untuk mengukur kesamaan antar film dan menghasilkan daftar rekomendasi yang dipersonalisasi?
