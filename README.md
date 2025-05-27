@@ -120,7 +120,7 @@ Model sistem rekomendasi yang dikembangkan menggunakan pendekatan Content-Based 
         4. Pemilihan Top-N Film: Memilih `top_n` film dengan skor tertinggi (tidak termasuk film input itu sendiri).
         5. Pengembalian Rekomendasi: Mengembalikan DataFrame yang berisi judul film rekomendasi dan skor similaritasnya.
 
-**Output Model (Contoh dari Notebook):**
+**Output Model:**
 
  - Untuk film 'Avatar', 10 film teratas yang direkomendasikan antara lain 'Falcon Rising' (skor 0.204), 'Battle: Los Angeles' (skor 0.194), dan 'Apollo 18' (skor 0.184).
  - Untuk film 'The Dark Knight Rises', rekomendasinya adalah 'The Dark Knight' (skor 0.445), 'Batman Returns' (skor 0.390), dan 'Batman Begins' (skor 0.331).
