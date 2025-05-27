@@ -36,7 +36,31 @@ Dataset yang digunakan dalam proyek ini yang bersumber dari Kaggle adalah ["TMDB
 
 ### Informasi Awal Dataset:
  - Jumlah data unik pada `movies_df` (berdasarkan `id`): 4803.
+ - `budget`: Merupakan jumlah anggaran yang dialokasikan untuk produksi sebuah film, biasanya dalam mata uang dolar AS.
+ - `genres`: Kategori atau jenis film tersebut, misalnya 'Action', 'Comedy', 'Drama', 'Science Fiction'. Dalam dataset TMDB, kolom ini awalnya seringkali berupa string JSON yang berisi daftar genre beserta ID-nya.
+ - `homepage`: Alamat URL (link) ke situs web atau halaman resmi film tersebut.
+ - `id`: Sebuah nomor identifikasi unik yang diberikan kepada setiap film dalam dataset `movies_df`. Dalam notebook yang Anda berikan, kolom ini diubah namanya menjadi `movie_id` untuk keperluan penggabungan data.
+ - `keywords`: Kata-kata kunci atau frasa yang mendeskripsikan tema, plot, atau elemen penting dalam film. Seperti `genres`, kolom ini juga seringkali dalam format string JSON di dataset TMDB.
+ - `original_language`: Kode bahasa (misalnya 'en' untuk Inggris, 'fr' untuk Prancis) yang menunjukkan bahasa asli film tersebut sebelum adanya dubbing atau subtitle.
+ - `original_title`: Judul film dalam bahasa aslinya. Ini bisa berbeda dengan judul rilis internasional atau judul dalam bahasa Inggris.
+ - `overview`: Sinopsis atau ringkasan singkat dari alur cerita film.
+ - `popularity`: Sebuah skor numerik yang mengindikasikan seberapa populer film tersebut. Metrik ini biasanya dihitung oleh penyedia data (seperti TMDB) berdasarkan berbagai faktor seperti jumlah penonton, rating, dan aktivitas terkait lainnya.
+ - `production_companies`: Daftar nama perusahaan produksi yang terlibat dalam pembuatan film. Kolom ini juga seringkali dalam format string JSON.
+ - `production_countries`: Daftar negara tempat film tersebut diproduksi. Kolom ini juga seringkali dalam format string JSON.
+ - `release_date`: Tanggal ketika film tersebut pertama kali dirilis ke publik.
+ - `revenue`: Total pendapatan kotor yang dihasilkan oleh film tersebut dari penayangan di seluruh dunia.
+ - `runtime`: Durasi atau lama waktu pemutaran film, biasanya dalam satuan menit.
+ - `spoken_languages`: Daftar bahasa yang diucapkan dalam film. Kolom ini juga seringkali dalam format string JSON.
+ - `status`: Status rilis film pada saat data dikumpulkan, misalnya 'Released' (Sudah Dirilis), 'Post Production' (Pasca Produksi), atau 'Rumored' (Dirumorkan).
+ - `tagline`: Slogan atau frasa pendek yang menarik dan mudah diingat, yang digunakan dalam promosi film.
+ - `title`: Judul film yang umum digunakan atau judul rilis utama (seringkali dalam bahasa Inggris untuk dataset internasional).kolom `title_x` dari `movies_df` dipilih dan diubah namanya menjadi `title`.
+ - `vote_average`: Rata-rata skor rating yang diberikan oleh pengguna untuk film tersebut, biasanya dalam skala tertentu (misalnya 1-10).
+ - `vote_count`: Jumlah total suara atau rating yang telah diterima oleh film tersebut dari pengguna.
  - Jumlah data unik pada `credits_df` (berdasarkan `movie_id`): 4803.
+ - `movie_id`: Nomor identifikasi unik untuk film, yang berfungsi sebagai kunci untuk menghubungkan data kredit ini dengan data film di tabel `movies_df`.
+ - `title`: Judul film, yang seharusnya konsisten dengan judul di tabel `movies_df` untuk `movie_id` yang sama. Dalam notebook, `title_x` dari `movies_df` yang akhirnya digunakan.
+ - `cast`: Daftar aktor dan aktris yang berperan dalam film, beserta karakter yang mereka perankan. Kolom ini awalnya berupa string JSON dan dalam notebook diproses untuk mengambil beberapa nama aktor utama.
+ - `crew`: Daftar anggota kru yang terlibat dalam produksi film, seperti sutradara, penulis skenario, produser, dll., beserta jabatan mereka. Kolom ini awalnya berupa string JSON dan dalam notebook diproses untuk mengambil nama sutradara.
  - Setelah penggabungan, dataset awal memiliki 4803 baris.
  - Beberapa kolom memiliki nilai yang hilang (missing values), seperti `homepage`, `tagline`, dan yang paling relevan untuk proyek ini, `overview` (3 nilai hilang). Kolom `release_date` dan `runtime` juga memiliki beberapa nilai hilang namun tidak secara langsung digunakan dalam pembuatan fitur 'tags'.
  - Tipe data didominasi oleh objek (string), integer, dan float.
