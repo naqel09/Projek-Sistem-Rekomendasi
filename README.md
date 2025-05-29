@@ -164,6 +164,38 @@ Fungsi `get_recommendations` dirancang untuk mengambil judul film sebagai input 
   2. **Mendapatkan Skor Kesamaan:** Setelah indeks film ditemukan, fungsi mengambil baris yang sesuai dari matriks kesamaan kosinus. Baris ini berisi skor kesamaan antara film input dan semua film lainnya.
   3. **Mengurutkan Rekomendasi:** Skor kesamaan kemudian diurutkan dalam urutan menurun. Film-film dengan skor kesamaan tertinggi adalah yang paling mirip dengan film input.
   4. **Mengeluarkan Top-N Rekomendasi:** Fungsi mengembalikan judul dari N film teratas (misalnya, 10 film) yang memiliki skor kesamaan tertinggi, tidak termasuk film input itu sendiri.
+
+### contoh Hasil Rekomendasi:
+**Rekomendasi untuk film "Avatar"**
+
+|       | Judul Film Rekomendasi                    | Skor Similaritas|
+| ----  | ----------------------------------------- | ----------------|
+| 3723  | Falcon Rising                             | 0.204           |
+| 582   | Battle: Los Angeles                       | 0.194           |
+| 3603  | Apollo 18                                 | 0.184           |
+| 47    | Star Trek Into Darkness                   | 0.171           |
+| 1201  | Predators                                 | 0.166           |
+| 539   | Titan A.E.                                | 0.166           |
+| 2403  | Aliens                                    | 0.163           |
+| 942   | The Book of Life                          | 0.163           |
+| 260   | Ender's Game                              | 0.160           |
+| 557   | Jarhead                                   | 0.160           |
+
+**Rekomendasi untuk film "The Dark Knight Rises"**
+
+|      | Judul Film Rekomendasi                    | Skor Similaritas|
+| ---- | ----------------------------------------- | ----------------|
+| 1    |   Batman Begins                           | 0.278           |
+| 14   |   Man of Steel                            | 0.272           |
+| 65   |   The Dark Knight                         | 0.258           |
+| 428  |   Batman Returns                          | 0.258           |
+| 3    |   The Dark Knight Rises                   | 0.242           |
+| 1359 |   Batman                                  | 0.212           |
+| 870  |   Superman II                             | 0.211           |
+| 1296 |   Superman III                            | 0.202           |
+| 3818 |   Defendor                                | 0.202           |
+| 210  |   Batman & Robin                          | 0.201           |
+
 Dengan demikian, fungsi rekomendasi dibuat dan digunakan untuk memberikan saran film secara otomatis berdasarkan preferensi implisit pengguna yang ditunjukkan oleh film yang mereka tonton atau sukai.
 
 ---
