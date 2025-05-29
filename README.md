@@ -112,71 +112,114 @@ Tahapan persiapan data dilakukan untuk mengubah data mentah menjadi format yang 
     - **Finalisasi Kolom 'tags':**
         - List kata-kata dalam kolom `tags` digabungkan kembali menjadi satu string tunggal per film, dengan semua kata dalam huruf kecil dan dipisahkan oleh spasi (`" ".join(x).lower()`).
 
-    - **Pembuatan DataFrame Final:**
-        - DataFrame baru `final_df` dibuat yang hanya berisi kolom `movie_id`, `title`, dan `tags` yang sudah diproses. DataFrame ini menjadi dasar untuk tahap pemodelan.
-          
+5. **Pembuatan DataFrame Final untuk Vektorisasi:**
+   - DataFrame baru final_df dibuat yang hanya berisi kolom `movie_id`, `title`, dan `tags` yang sudah diproses. DataFrame ini menjadi input untuk tahap ekstraksi fitur numerik.
+
+6. **Ekstraksi Fitur Numerik dengan TF-IDF Vectorizer:**
+   - TfidfVectorizer dari library sklearn.feature_extraction.text digunakan untuk mengubah kumpulan teks dalam kolom tags dari final_df menjadi matriks representasi numerik TF-IDF. TF-IDF (Term Frequency-Inverse Document Frequency) adalah sebuah bobot statistik yang digunakan untuk mengevaluasi seberapa penting sebuah kata dalam sebuah dokumen dalam suatu koleksi atau korpus.
+
+   - Parameter yang digunakan pada `TfidfVectorizer`:
+     - `max_features=5000`: Membatasi jumlah fitur (kata unik) yang dipertimbangkan menjadi 5000 kata yang paling sering muncul di seluruh dataset. Ini membantu mengurangi dimensi data dan fokus pada kata-kata yang lebih signifikan.
+
+     - `stop_words='english'`: Menghilangkan kata-kata umum dalam bahasa Inggris (misalnya, "the", "is", "in") yang tidak banyak memberikan makna diskriminatif terhadap konten film.
+
+   - Proses fit_transform() pada tfidf_vectorizer diterapkan ke kolom data['tags'] (yang berasal dari final_df['tags']) untuk mempelajari kosakata dari semua tag film dan kemudian mengubah setiap tag menjadi vektor fitur numerik. Hasilnya adalah tfidf_matrix.
+
+   - Ukuran tfidf_matrix yang dihasilkan adalah (4800, 5000), yang berarti ada 4800 film (dokumen) dan 5000 fitur kata unik (term) yang digunakan untuk merepresentasikan setiap film.
+
 Alasan dilakukannya tahapan persiapan data ini adalah untuk memastikan bahwa fitur-fitur yang digunakan bersih, konsisten, dan dalam format yang dapat diproses oleh algoritma machine learning (khususnya text vectorizer). Penggabungan fitur ke dalam satu kolom 'tags' menyederhanakan proses ekstraksi fitur numerik dan memungkinkan model untuk menangkap esensi konten film secara holistik.
 
 ---
 ## Modeling
-Model sistem rekomendasi yang dikembangkan menggunakan pendekatan Content-Based Filtering. Pendekatan ini merekomendasikan item berdasarkan perbandingan antara konten item dengan profil pengguna atau item lain yang telah dilihat/disukai pengguna. Dalam kasus ini, rekomendasi diberikan berdasarkan kemiripan konten antar film.
+Content-Based Filtering bekerja dengan merekomendasikan item yang serupa dengan item yang disukai pengguna di masa lalu. Dalam konteks sistem rekomendasi film, ini berarti jika pengguna menyukai film tertentu, sistem akan merekomendasikan film lain yang memiliki karakteristik (genre, kata kunci, aktor, sutradara, deskripsi) serupa.
 
-### Tahapan Pemodelan:
- 1. **Ekstraksi Fitur dengan TF-IDF Vectorizer:**
-    - Data yang digunakan adalah `final_df` yang berisi kolom `tags` untuk setiap film.
-    - `TfidfVectorizer` dari library `sklearn.feature_extraction.text` digunakan untuk mengubah kumpulan teks dalam kolom 'tags' menjadi matriks representasi numerik TF-IDF.
-    - Parameter yang digunakan pada `TfidfVectorizer`:
-      - `max_features=5000`: Membatasi jumlah fitur (kata unik) yang dipertimbangkan menjadi 5000 kata yang paling sering muncul di seluruh dataset. Ini membantu mengurangi dimensi data dan fokus pada kata-kata yang lebih signifikan.
-      - `stop_words='english'`: Menghilangkan kata-kata umum dalam bahasa Inggris (misalnya, "the", "is", "in") yang tidak banyak memberikan makna diskriminatif terhadap konten film.
-    - Proses `fit_transform()` pada `tfidf_vectorizer` diterapkan ke kolom `data['tags']` untuk mempelajari kosakata dan menghasilkan `tfidf_matrix`. Ukuran tfidf_matrix yang dihasilkan adalah (4800, 5000), yang berarti ada 4800 film dan 5000 fitur kata unik.
+**Cara Kerja Content-Based Filtering setelah Fitur Diekstraksi:**
 
-2. **Perhitungan Kesamaan Kosinus (Cosine Similarity):**
-    - Setelah mendapatkan representasi vektor TF-IDF untuk setiap film, langkah selanjutnya adalah menghitung kesamaan antar film.
-`cosine_similarity` dari `sklearn.metrics.pairwise` digunakan untuk menghitung kesamaan kosinus antara semua pasangan vektor film dalam `tfidf_matrix`.
-    - Hasilnya adalah `cosine_sim`, sebuah matriks (4800x4800) di mana setiap elemen (`i, j`) merepresentasikan skor kesamaan kosinus antara film ke-i dan film ke-j. Skor berkisar antara 0 (tidak mirip) hingga 1 (sangat mirip).
+1. **Ekstraksi Fitur Teks:** Fitur-fitur tekstual seperti `genres`, `keywords`, `overview`, `cast`, dan `director` dari setiap film digabungkan menjadi satu representasi tekstual (`soup`).
 
-3. **Pembuatan Fungsi Rekomendasi:**
-    - Sebuah fungsi `get_recommendations(title, cosine_sim_matrix, df, movie_indices, top_n=10)` didefinisikan untuk menghasilkan rekomendasi.
-    - Langkah-langkah dalam fungsi:
-        1. Pencarian Indeks Film: Mencari indeks film berdasarkan `title` yang diberikan. Terdapat penanganan jika judul tidak ditemukan persis, yaitu dengan mencari judul yang mengandung string input (case-insensitive). Jika ditemukan beberapa judul yang mirip, judul pertama yang cocok akan digunakan.
-        2. Pengambilan Skor Similaritas: Mendapatkan baris skor similaritas dari `cosine_sim_matrix` yang sesuai dengan film input.
-        3. Pengurutan Skor: Mengurutkan film berdasarkan skor similaritas secara menurun.
-        4. Pemilihan Top-N Film: Memilih `top_n` film dengan skor tertinggi (tidak termasuk film input itu sendiri).
-        5. Pengembalian Rekomendasi: Mengembalikan DataFrame yang berisi judul film rekomendasi dan skor similaritasnya.
+2. **Pembobotan TF-IDF:**
 
-**Output Model:**
+   - **TF-IDF (Term Frequency-Inverse Document Frequency)** adalah teknik pembobotan yang digunakan untuk mencerminkan seberapa penting sebuah kata dalam dokumen relatif terhadap korpus.
+   - Term Frequency (TF) mengukur seberapa sering sebuah kata muncul dalam sebuah dokumen.
+   - Inverse Document Frequency (IDF) mengukur seberapa jarang sebuah kata muncul di seluruh korpus dokumen. Kata yang jarang muncul di banyak dokumen tetapi sering muncul di satu dokumen tertentu akan memiliki bobot IDF yang tinggi, menunjukkan relevansinya yang unik.
+   - Dalam proyek ini, `TfidfVectorizer` dari scikit-learn digunakan untuk mengonversi kumpulan teks `soup` dari semua film menjadi matriks fitur TF-IDF. Setiap baris dalam matriks ini merepresentasikan sebuah film, dan setiap kolom merepresentasikan sebuah kata (fitur), dengan nilai di setiap sel menunjukkan bobot TF-IDF kata tersebut untuk film tersebut.
 
- - Untuk film 'Avatar', 10 film teratas yang direkomendasikan antara lain 'Falcon Rising' (skor 0.204), 'Battle: Los Angeles' (skor 0.194), dan 'Apollo 18' (skor 0.184).
- - Untuk film 'The Dark Knight Rises', rekomendasinya adalah 'The Dark Knight' (skor 0.445), 'Batman Returns' (skor 0.390), dan 'Batman Begins' (skor 0.331).
- - Untuk pencarian 'batman' (judul tidak persis), sistem menemukan beberapa judul yang mirip dan menggunakan 'Batman v Superman: Dawn of Justice' sebagai basis, kemudian merekomendasikan film seperti 'Batman Begins' (skor 0.278) dan 'Man of Steel' (skor 0.272).
-    
-**Kelebihan Pendekatan Content-Based Filtering:**
+3. **Penghitungan Kesamaan (Cosine Similarity):**
 
-- Dapat merekomendasikan item yang sangat spesifik atau niche kepada pengguna.
-- Tidak memerlukan data dari pengguna lain (mengatasi masalah user cold-start تا حدی).
-- Rekomendasi bersifat transparan karena dapat dijelaskan berdasarkan fitur item.
+   - Setelah fitur tekstual dikonversi menjadi representasi numerik (matriks TF-IDF), langkah selanjutnya adalah menghitung tingkat kesamaan antara film-film.
+   - **Cosine Similarity** adalah metrik yang umum digunakan untuk mengukur kesamaan antara dua vektor dalam ruang multidimensi. Nilainya berkisar antara 0 (tidak ada kesamaan) hingga 1 (sangat mirip).
+   - Rumus Cosine Similarity antara dua vektor A dan B adalah:
+     
+         similarity=cos(θ)= A⋅B∥A∥∥B∥
+     
+di mana A⋅B adalah produk dot dari vektor A dan B, dan ∥A∥ serta ∥B∥ adalah magnitudo (panjang) dari masing-masing vektor.
 
-**Kekurangan Pendekatan Content-Based Filtering:**
+   - cosine_similarity dari scikit-learn digunakan untuk menghitung matriks kesamaan kosinus antara semua film berdasarkan matriks TF-IDF mereka. Matriks kesamaan ini akan memiliki dimensi N×N, di mana N adalah jumlah film, dan setiap sel (i,j) berisi skor kesamaan antara film i dan film j.
+  
+**Fungsi Rekomendasi (`get_recommendations`)**
 
- - Terbatas pada fitur item yang ada; jika fitur tidak cukup deskriptif, kualitas rekomendasi bisa buruk.
- - Keterbatasan dalam menemukan item yang benar-benar baru atau berbeda dari profil pengguna (limited serendipity), cenderung merekomendasikan item yang mirip dengan apa yang sudah disukai.
- - Membutuhkan feature engineering yang baik.
- - Mengalami masalah item cold-start: item baru tanpa fitur yang cukup tidak dapat direkomendasikan.
+Fungsi `get_recommendations` dirancang untuk mengambil judul film sebagai input dan mengembalikan daftar film yang direkomendasikan berdasarkan kemiripan konten.
+
+  1. **Mendapatkan Indeks Film:** Fungsi pertama-tama mencari indeks film yang diberikan dalam dataset berdasarkan judulnya. Ini penting karena matriks kesamaan diindeks berdasarkan posisi film.
+  2. **Mendapatkan Skor Kesamaan:** Setelah indeks film ditemukan, fungsi mengambil baris yang sesuai dari matriks kesamaan kosinus. Baris ini berisi skor kesamaan antara film input dan semua film lainnya.
+  3. **Mengurutkan Rekomendasi:** Skor kesamaan kemudian diurutkan dalam urutan menurun. Film-film dengan skor kesamaan tertinggi adalah yang paling mirip dengan film input.
+  4. **Mengeluarkan Top-N Rekomendasi:** Fungsi mengembalikan judul dari N film teratas (misalnya, 10 film) yang memiliki skor kesamaan tertinggi, tidak termasuk film input itu sendiri.
+Dengan demikian, fungsi rekomendasi dibuat dan digunakan untuk memberikan saran film secara otomatis berdasarkan preferensi implisit pengguna yang ditunjukkan oleh film yang mereka tonton atau sukai.
 
 ---
 ## Evaluation
-evaluasi sistem rekomendasi dilakukan secara kualitatif dengan mengamati relevansi dari top-N film yang direkomendasikan untuk beberapa judul film input. Tidak ada metrik evaluasi kuantitatif formal seperti presisi, recall, F1-score, MAP (Mean Average Precision), atau NDCG (Normalized Discounted Cumulative Gain) yang dihitung.
+### Mengapa Metrik Ini Dipilih?
+- **Fokus pada Top-N Rekomendasi:** Sistem rekomendasi umumnya memberikan daftar rekomendasi teratas kepada pengguna (misalnya, 10 film teratas). Metrik Precision@K dan Recall@K secara langsung mengevaluasi kualitas rekomendasi dalam daftar "Top-N" ini. Ini sangat relevan dengan pengalaman pengguna akhir, di mana pengguna cenderung hanya melihat beberapa rekomendasi pertama.
 
-### Hasil Proyek Berdasarkan Observasi Kualitatif:
- - **Relevansi Rekomendasi:** Berdasarkan contoh-contoh output dalam notebook:
-    - Untuk film 'Avatar', yang merupakan film fiksi ilmiah dengan tema luar angkasa dan pertempuran, beberapa rekomendasi seperti 'Battle: Los Angeles' (invasi alien), 'Star Trek Into Darkness' (luar angkasa), dan 'Aliens' tampak cukup relevan dari segi genre atau tema.
-    - Untuk film 'The Dark Knight Rises', sebagian besar rekomendasi adalah film-film Batman lainnya atau film superhero DC, yang sangat relevan ('The Dark Knight', 'Batman Begins', 'Batman Returns', 'Batman v Superman: Dawn of Justice'). Ini menunjukkan kemampuan model untuk menangkap kesamaan berdasarkan franchise dan karakter utama.
-    - Fungsi pencarian judul yang fleksibel juga berhasil menangani input 'batman' dengan menyarankan film-film Batman yang relevan, meskipun inputnya tidak spesifik.
- - **Skor Similaritas**: Skor similaritas yang menyertai rekomendasi memberikan indikasi seberapa mirip konten film yang direkomendasikan dengan film input. Misalnya, 'The Dark Knight' memiliki skor similaritas 0.445 dengan 'The Dark Knight Rises', menunjukkan kemiripan yang tinggi.
+- **Precision@K:** Metrik ini sangat penting karena mengukur seberapa akurat rekomendasi yang diberikan. Dalam konteks sistem rekomendasi film, Precision@K memberitahu kita berapa proporsi film yang direkomendasikan dan benar-benar relevan bagi pengguna di antara K film teratas. Pengguna ingin rekomendasi yang mereka lihat di awal daftar adalah yang berkualitas tinggi dan relevan. Precision yang tinggi menunjukkan bahwa sistem tidak "membuang-buang" perhatian pengguna dengan rekomendasi yang tidak relevan.
 
-### Diskusi Metrik Evaluasi (Jika Ingin Digunakan):
-Meskipun tidak diimplementasikan, jika evaluasi kuantitatif diinginkan untuk sistem content-based filtering seperti ini, beberapa pendekatan bisa dipertimbangkan:
-- **Presisi@k:** Proporsi film yang relevan dari k film teratas yang direkomendasikan.
-- **Recall@k:** Proporsi film relevan yang berhasil direkomendasikan dari semua film relevan yang ada. Untuk menggunakan metrik ini, diperlukan dataset ground truth yang mendefinisikan film mana yang dianggap "relevan" atau "mirip" untuk setiap film input, yang bisa berasal dari data historis interaksi pengguna atau penilaian ahli.
+- **Recall@K:** Sementara Precision@K berfokus pada relevansi dari rekomendasi yang diberikan, Recall@K mengukur seberapa lengkap sistem dalam menemukan semua item relevan yang mungkin disukai pengguna. Dalam hal ini, Recall@K memberitahu kita berapa proporsi film relevan yang berhasil ditemukan oleh sistem di antara K rekomendasi teratas dari total film relevan yang ada. Recall yang tinggi menunjukkan bahwa sistem tidak melewatkan banyak film yang seharusnya relevan bagi pengguna.
 
-Secara keseluruhan, berdasarkan analisis kualitatif dari output yang dihasilkan, model yang dikembangkan mampu memberikan rekomendasi yang masuk akal dan relevan berdasarkan konten film yang diolah.
+- **Keseimbangan antara Akurasi dan Cakupan:** Dalam sistem rekomendasi, seringkali ada trade-off antara Precision dan Recall. Sistem yang sangat presisi mungkin hanya merekomendasikan sedikit item tetapi semuanya relevan, sementara sistem dengan Recall tinggi mungkin merekomendasikan banyak item tetapi beberapa di antaranya mungkin tidak relevan. Dengan menggunakan kedua metrik ini secara bersamaan, kita bisa mendapatkan gambaran yang lebih komprehensif tentang performa sistem dan memahami apakah sistem lebih cenderung memberikan rekomendasi yang akurat tetapi terbatas, atau rekomendasi yang lebih luas tetapi kurang akurat.
+
+- **Relevansi untuk Content-Based Filtering:** Untuk sistem Content-Based Filtering di mana relevansi didefinisikan berdasarkan kesamaan fitur, Precision@K dan Recall@K sangat cocok. Kita dapat dengan jelas menentukan "relevan" berdasarkan ambang batas kesamaan kosinus dan kemudian mengukur seberapa baik sistem menemukan film yang secara konten serupa.
+Evaluasi adalah tahap krusial untuk mengukur seberapa baik performa sistem rekomendasi. Dalam proyek ini, evaluasi dilakukan secara kuantitatif menggunakan metrik Precision@K dan Recall@K.
+
+### Metrik Evaluasi
+- **Precision@K:** Mengukur proporsi item relevan di antara K item teratas yang direkomendasikan.
+
+  - **Rumus:**
+
+        Precision@K= Jumlah rekomendasi relevan di K teratas/K
+    
+  - Dalam konteks ini, "relevan" didefinisikan berdasarkan kesamaan fitur film. Jika film yang direkomendasikan memiliki kesamaan yang tinggi dengan film yang dievaluasi, itu dianggap relevan.
+Recall@K: Mengukur proporsi item relevan yang berhasil ditemukan dari seluruh item relevan yang seharusnya ada.
+
+  - **Rumus:**
+
+        Recall@K=Jumlah rekomendasi relevan di K teratas/Total jumlah item relevan
+
+  - "Total jumlah item relevan" di sini mengacu pada semua film dalam dataset yang memiliki skor kesamaan di atas ambang batas tertentu dengan film yang sedang dievaluasi.
+    
+**Proses Evaluasi**
+1. **Sampling Film:** 100 film acak diambil dari dataset untuk dievaluasi.
+2. **Mendapatkan Rekomendasi:** Untuk setiap film yang diambil sampelnya, 10 rekomendasi teratas (K=10) dihasilkan menggunakan fungsi get_recommendations().
+3. **Mengukur Relevansi:** Untuk setiap rekomendasi, relevansinya diukur. Ambang batas kesamaan (misalnya, skor kesamaan > 0.6) digunakan untuk menentukan apakah suatu film yang direkomendasikan dianggap "relevan" dengan film aslinya.
+4. **Menghitung Metrik:** Precision@10 dan Recall@10 dihitung untuk setiap film yang dievaluasi.
+5. **Rata-rata Hasil:** Rata-rata dari Precision@10 dan Recall@10 dari 100 film yang dievaluasi kemudian disajikan sebagai hasil akhir.
+
+**Hasil Numerik**
+Setelah menjalankan proses evaluasi, berikut adalah hasil numerik dari metrik Precision@10 dan Recall@10:
+```
+------------------------------
+Evaluation Results (for K=10 over 100 successfully evaluated movies):
+Average Precision@10: 0.2860
+Average Recall@10: 0.0057
+------------------------------
+```
+**Analisis Hasil:**
+
+  - **Average Precision@10: 0.2860:** Ini berarti rata-rata, sekitar 28.6% dari 10 rekomendasi teratas yang diberikan oleh sistem adalah relevan. Nilai ini menunjukkan bahwa sistem memiliki kemampuan yang cukup baik dalam merekomendasikan film yang serupa. Namun, masih ada ruang untuk peningkatan untuk merekomendasikan lebih banyak film yang relevan di antara 10 teratas.
+  - **Average Recall@10: 0.0057:** Nilai Recall@10 yang rendah (sekitar 0.57%) menunjukkan bahwa sistem hanya berhasil menangkap sebagian kecil dari semua film relevan yang seharusnya ada. Ini bisa berarti bahwa meskipun rekomendasi yang diberikan relevan (sesuai dengan Precision), 
+**Implikasi:**
+
+Hasil ini menunjukkan bahwa sistem rekomendasi Content-Based Filtering yang dibangun dapat memberikan rekomendasi yang cukup akurat (dari segi Precision), tetapi mungkin kurang dalam cakupan (dari segi Recall). Potensi perbaikan dapat mencakup:
+
+  - **Penyempurnaan Fitur:** Mengeksplorasi fitur tambahan atau teknik rekayasa fitur yang lebih canggih.
+  - **Peningkatan Model:** Mempertimbangkan algoritma lain atau kombinasi algoritma (misalnya, hybrid recommendation systems).
+  - **Tuning Parameter:** Mengoptimalkan ambang batas kesamaan atau jumlah rekomendasi (K) untuk mencapai keseimbangan yang lebih baik antara Precision dan Recall.
