@@ -183,18 +183,18 @@ Fungsi `get_recommendations` dirancang untuk mengambil judul film sebagai input 
 
 **Rekomendasi untuk film "The Dark Knight Rises"**
 
-|      | Judul Film Rekomendasi                    | Skor Similaritas|
-| ---- | ----------------------------------------- | ----------------|
-| 1    |   Batman Begins                           | 0.278           |
-| 14   |   Man of Steel                            | 0.272           |
-| 65   |   The Dark Knight                         | 0.258           |
-| 428  |   Batman Returns                          | 0.258           |
-| 3    |   The Dark Knight Rises                   | 0.242           |
-| 1359 |   Batman                                  | 0.212           |
-| 870  |   Superman II                             | 0.211           |
-| 1296 |   Superman III                            | 0.202           |
-| 3818 |   Defendor                                | 0.202           |
-| 210  |   Batman & Robin                          | 0.201           |
+|       | Judul Film Rekomendasi                     |Skor Similaritas|
+|-------|--------------------------------------------|----------------|
+| 65    | The Dark Knight                            | 0.445          |
+| 428   | Batman Returns                             | 0.390          |
+| 119   | Batman Begins                              | 0.331          |
+| 299   | Batman Forever                             | 0.319          |
+| 1359  | Batman                                     | 0.282          | 
+| 3853  | Batman: The Dark Knight Returns, Part 2    | 0.249          |
+| 9     | Batman v Superman: Dawn of Justice         | 0.242          |
+| 210   | Batman & Robin                             | 0.223          |
+| 507   | Slow Burn                                  | 0.194          |
+| 3818  | Defendor                                   | 0.140          |
 
 Dengan demikian, fungsi rekomendasi dibuat dan digunakan untuk memberikan saran film secara otomatis berdasarkan preferensi implisit pengguna yang ditunjukkan oleh film yang mereka tonton atau sukai.
 
