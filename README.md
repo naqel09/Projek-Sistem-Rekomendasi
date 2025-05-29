@@ -149,8 +149,8 @@ Content-Based Filtering bekerja dengan merekomendasikan item yang serupa dengan 
    - Setelah fitur tekstual dikonversi menjadi representasi numerik (matriks TF-IDF), langkah selanjutnya adalah menghitung tingkat kesamaan antara film-film.
    - **Cosine Similarity** adalah metrik yang umum digunakan untuk mengukur kesamaan antara dua vektor dalam ruang multidimensi. Nilainya berkisar antara 0 (tidak ada kesamaan) hingga 1 (sangat mirip).
    - Rumus Cosine Similarity antara dua vektor A dan B adalah:
-     
-         similarity=cos(θ)= A⋅B∥A∥∥B∥
+
+     $$ \text{similarity} = \cos(\theta) = \frac{A \cdot B}{|A| |B|} $$ 
      
 di mana A⋅B adalah produk dot dari vektor A dan B, dan ∥A∥ serta ∥B∥ adalah magnitudo (panjang) dari masing-masing vektor.
 
@@ -185,14 +185,17 @@ Evaluasi adalah tahap krusial untuk mengukur seberapa baik performa sistem rekom
 
   - **Rumus:**
 
-        Precision@K= Jumlah rekomendasi relevan di K teratas/K
+$$ \text{Precision@K} = \frac{\text{Jumlah rekomendasi relevan di } K \text{ teratas}}{K} $$
+
     
   - Dalam konteks ini, "relevan" didefinisikan berdasarkan kesamaan fitur film. Jika film yang direkomendasikan memiliki kesamaan yang tinggi dengan film yang dievaluasi, itu dianggap relevan.
 Recall@K: Mengukur proporsi item relevan yang berhasil ditemukan dari seluruh item relevan yang seharusnya ada.
 
   - **Rumus:**
+    
+$$ \text{Recall@K} = \frac{\text{Jumlah rekomendasi relevan di } K \text{ teratas}}{\text{Total jumlah item relevan}} $$
 
-        Recall@K=Jumlah rekomendasi relevan di K teratas/Total jumlah item relevan
+        
 
   - "Total jumlah item relevan" di sini mengacu pada semua film dalam dataset yang memiliki skor kesamaan di atas ambang batas tertentu dengan film yang sedang dievaluasi.
     
